@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { AuthContext } from '../../../context/UserContext';
+import { AppContext } from '../../../context/AppContext/AppContext';
 import logo from "../../../assets/images/logo.png";
 
 const Navbar = () => {
-    const { user, logOut, deleteTheUser } = useContext(AuthContext);
+    const { user, logOut, deleteTheUser } = useContext(AppContext);
     const navigate = useNavigate();
 
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

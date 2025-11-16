@@ -49,8 +49,8 @@ const DashboardLayout = () => {
                                         to="/dashboard/allUsersDashboard"
                                         className={({ isActive }) =>
                                             `px-2 py-1 transition-colors ${isActive
-                                                ? "border-b-2 border-primary text-black"
-                                                : "text-black"
+                                                ? "border-b-2 border-primary text-primary"
+                                                : "text-gray-600"
                                             }`
                                         }
                                     >

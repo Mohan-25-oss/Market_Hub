@@ -3,13 +3,13 @@ import { CheckCircle, Trash2, UserCheck } from "lucide-react";
 
 const AdminDashboard = () => {
     const [sellers, setSellers] = useState([
-        { id: 1, name: "Rahim Uddin", email: "rahim@seller.com", verified: false },
-        { id: 2, name: "Karim Ali", email: "karim@seller.com", verified: true },
+        { id: 1, name: "Rahim Uddin", phone: "0123456789", email: "rahim@seller.com", verified: false },
+        { id: 2, name: "Karim Ali", phone: "0123456790", email: "karim@seller.com", verified: true },
     ]);
 
     const [buyers, setBuyers] = useState([
-        { id: 1, name: "Sumaiya Akter", email: "sumaiya@buyer.com" },
-        { id: 2, name: "Rafiq Hasan", email: "rafiq@buyer.com" },
+        { id: 1, name: "Sumaiya Akter", phone: "0123456791", email: "sumaiya@buyer.com" },
+        { id: 2, name: "Rafiq Hasan", phone: "0123456792", email: "rafiq@buyer.com" },
     ]);
 
     const verifySeller = (id) => {
@@ -38,16 +38,20 @@ const AdminDashboard = () => {
                 <table className="min-w-full border rounded-lg">
                     <thead>
                         <tr className="bg-gray-100">
+                            <th className="py-2 px-4 text-left">Serial No</th>
                             <th className="py-2 px-4 text-left">Name</th>
+                            <th className="py-2 px-4 text-left">Phone</th>
                             <th className="py-2 px-4 text-left">Email</th>
                             <th className="py-2 px-4 text-left">Status</th>
                             <th className="py-2 px-4 text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {sellers.map((seller) => (
+                        {sellers.map((seller, index) => (
                             <tr key={seller.id} className="border-t hover:bg-gray-50">
+                                <td className="py-2 px-4">{index + 1}</td>
                                 <td className="py-2 px-4">{seller.name}</td>
+                                <td className="py-2 px-4">{seller.phone}</td>
                                 <td className="py-2 px-4">{seller.email}</td>
                                 <td className="py-2 px-4">
                                     {seller.verified ? (
@@ -86,16 +90,22 @@ const AdminDashboard = () => {
                 <table className="min-w-full border rounded-lg">
                     <thead>
                         <tr className="bg-gray-100">
+                            <th className="py-2 px-4 text-left">Serial No</th>
                             <th className="py-2 px-4 text-left">Name</th>
+                            <th className="py-2 px-4 text-left">Phone</th>
                             <th className="py-2 px-4 text-left">Email</th>
+                            <th className="py-2 px-4 text-left">Status</th>
                             <th className="py-2 px-4 text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {buyers.map((buyer) => (
+                        {buyers.map((buyer, index) => (
                             <tr key={buyer.id} className="border-t hover:bg-gray-50">
+                                <td className="py-2 px-4">{index + 1}</td>
                                 <td className="py-2 px-4">{buyer.name}</td>
+                                <td className="py-2 px-4">{buyer.phone}</td>
                                 <td className="py-2 px-4">{buyer.email}</td>
+                                <td className="py-2 px-4">-</td>
                                 <td className="py-2 px-4 text-center">
                                     <button
                                         onClick={() => deleteBuyer(buyer.id)}
