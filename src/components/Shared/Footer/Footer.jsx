@@ -1,5 +1,6 @@
 // Footer.jsx
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
     const [email, setEmail] = useState('');
@@ -129,7 +130,7 @@ const Footer = () => {
                             </div>
                             <div>
                                 <h2 className="text-3xl font-black bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                                    MarketHub
+                                    MarketPlace
                                 </h2>
                                 <p className="text-purple-200 text-sm">Your Trusted Marketplace</p>
                             </div>
@@ -276,9 +277,9 @@ const Footer = () => {
 
             {/* Floating Action Button */}
             <div className="fixed bottom-6 right-6 z-50">
-                <button className="w-14 h-14 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center text-white text-xl shadow-2xl hover:scale-110 transform transition-all duration-300 hover:shadow-purple-500/50 animate-bounce">
+                <Link to ="/contact" className="w-14 h-14 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center text-white text-xl shadow-2xl hover:scale-110 transform transition-all duration-300 hover:shadow-purple-500/50 animate-bounce">
                     💬
-                </button>
+                </Link>
             </div>
 
             {/* Background Decorations */}

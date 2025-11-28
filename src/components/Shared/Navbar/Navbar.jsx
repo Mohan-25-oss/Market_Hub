@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { AppContext } from '../../../context/AppContext/AppContext';
+import {AppContext} from "../../../context/AppContext/AppContext";
 import logo from "../../../assets/images/logo.png";
 
 const Navbar = () => {

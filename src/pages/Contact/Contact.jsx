@@ -22,7 +22,7 @@ const Contact = () => {
     };
 
     return (
-        <div className="flex justify-center items-center min-h-screen bg-gray-100 p-4">
+        <div className="flex justify-center items-center min-h-screen text-black bg-gray-100 p-4">
             <div className="w-full max-w-lg bg-white rounded-xl shadow-lg p-8">
                 <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">Contact Us</h2>
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -41,6 +41,22 @@ const Contact = () => {
                             required
                         />
                     </div>
+                    <div>
+                        <label className="block text-gray-700 mb-1" htmlFor="phone">
+                            Phone
+                        </label>
+                        <input
+                            type="text"
+                            id="phone"
+                            name="phone"
+                            value={formData.phone}
+                            onChange={handleChange}
+                            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Your Phone Number"
+                            required
+                        />
+                    </div>
+
                     <div>
                         <label className="block text-gray-700 mb-1" htmlFor="email">
                             Email

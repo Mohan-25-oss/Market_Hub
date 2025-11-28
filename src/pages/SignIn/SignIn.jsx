@@ -1,54 +1,87 @@
-// src/pages/SignIn/SignIn.jsx
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import logo from "../../assets/images/logo.png";
-import { useApp } from "../../context/AppContext/AppContext"; // FIXED: correct import
+import { useApp } from "../../context/AppContext/AppContext";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const SignIn = () => {
-  const { user, signInUser, googleAuthentication, authLoading, authError } = useApp();
-
+  const { signInUser, googleAuthentication, authLoading } = useApp();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [customError, setCustomError] = useState("");
-
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // Email/Password Sign In
+  // If redirected from PrivateRoute → go back to that page
+  // Otherwise redirect to /contact
+  const from = location.state?.from?.pathname || "/contact";
+
   const handleSignIn = async (e) => {
     e.preventDefault();
-    setCustomError("");
 
     if (!email || !password) {
-      setCustomError("Email and password are required");
+      toast.error("Email and password are required");
       return;
     }
 
     try {
       await signInUser(email, password);
-      navigate("/"); 
+      toast.success("Signed in successfully!");
+
+      // Redirect to previous page OR /contact
+      navigate(from, { replace: true });
+
     } catch (err) {
       console.error("Sign in error:", err);
 
-      if (err.code === "auth/user-not-found") setCustomError("No account found with this email");
-      else if (err.code === "auth/wrong-password") setCustomError("Incorrect password");
-      else setCustomError(err.message);
+      let msg = "Login failed!";
+      if (err.code === "auth/user-not-found") msg = "No account found with this email";
+      else if (err.code === "auth/wrong-password") msg = "Incorrect password";
+
+      toast.error(msg);
     }
   };
 
-  // Google Sign In
   const handleGoogleSignIn = async () => {
-    setCustomError("");
-
     try {
-      await googleAuthentication();
-      navigate("/");
+      const user = await googleAuthentication();
+
+      if (!user?.email) {
+        toast.error("Google account has no email");
+        return;
+      }
+
+      // Send to backend
+      const res = await fetch("http://localhost:5000/users/google", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: user.displayName || "Google User",
+          email: user.email,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+        toast.success("Google Sign-In successful!");
+
+        // Redirect to previous page OR /contact
+        navigate(from, { replace: true });
+
+      } else {
+        toast.error(data.message || "Google Sign-In failed");
+      }
     } catch (err) {
-      setCustomError(err.message);
+      console.error(err);
+      toast.error("Google Sign-In failed!");
     }
   };
 
   return (
     <div className="min-h-screen text-black bg-green-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <ToastContainer position="top-right" autoClose={3000} />
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <Link to="/" className="flex justify-center items-center">
@@ -70,20 +103,10 @@ const SignIn = () => {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow-xl sm:rounded-lg sm:px-10 border border-green-200">
-
-          {/* Error Message */}
-          {(customError || authError) && (
-            <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-              {customError || authError}
-            </div>
-          )}
-
           {/* Sign In Form */}
           <form className="space-y-6" onSubmit={handleSignIn}>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Email address
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Email address</label>
               <input
                 id="email"
                 type="email"
@@ -96,9 +119,7 @@ const SignIn = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Password</label>
               <input
                 id="password"
                 type="password"
@@ -119,16 +140,6 @@ const SignIn = () => {
             </button>
           </form>
 
-          {/* Divider */}
-          <div className="mt-6 relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">Or continue with</span>
-            </div>
-          </div>
-
           {/* Google Sign In */}
           <div className="mt-6">
             <button
@@ -141,19 +152,8 @@ const SignIn = () => {
             </button>
           </div>
 
-          {/* Sign Up Link */}
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
-              Don’t have an account?{" "}
-              <Link to="/signup" className="font-medium text-green-600 hover:text-green-500">
-                Sign up now
-              </Link>
-            </p>
-          </div>
-
         </div>
       </div>
-
     </div>
   );
 };

@@ -1,123 +1,221 @@
-import React, { useState } from "react";
-import { CheckCircle, Trash2, UserCheck } from "lucide-react";
+// src/pages/AdminDashboard/AdminDashboard.jsx
+import React, { useEffect, useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const AdminDashboard = () => {
-    const [sellers, setSellers] = useState([
-        { id: 1, name: "Rahim Uddin", phone: "0123456789", email: "rahim@seller.com", verified: false },
-        { id: 2, name: "Karim Ali", phone: "0123456790", email: "karim@seller.com", verified: true },
-    ]);
+    const [users, setUsers] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [newUser, setNewUser] = useState({
+        name: "",
+        email: "",
+        password: "",
+        role: "user",
+    });
 
-    const [buyers, setBuyers] = useState([
-        { id: 1, name: "Sumaiya Akter", phone: "0123456791", email: "sumaiya@buyer.com" },
-        { id: 2, name: "Rafiq Hasan", phone: "0123456792", email: "rafiq@buyer.com" },
-    ]);
+    const token = localStorage.getItem("token");
 
-    const verifySeller = (id) => {
-        setSellers((prev) =>
-            prev.map((s) => (s.id === id ? { ...s, verified: true } : s))
-        );
+    const fetchUsers = async () => {
+        setLoading(true);
+        try {
+            const res = await fetch("http://localhost:5000/users", {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            const data = await res.json();
+            setUsers(data.users || []);
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to fetch users");
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const deleteSeller = (id) => {
-        setSellers((prev) => prev.filter((s) => s.id !== id));
+    useEffect(() => {
+        fetchUsers();
+    }, []);
+
+    const handleCreateUser = async (e) => {
+        e.preventDefault();
+        if (!newUser.name || !newUser.email || !newUser.password || !newUser.role) {
+            toast.error("All fields are required!");
+            return;
+        }
+
+        try {
+            const res = await fetch("http://localhost:5000/users/admin-create", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(newUser),
+            });
+            const data = await res.json();
+            if (data.success) {
+                toast.success("User created successfully!");
+                setNewUser({ name: "", email: "", password: "", role: "user" });
+                fetchUsers();
+            } else {
+                toast.error(data.message || "Failed to create user");
+            }
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to create user");
+        }
     };
 
-    const deleteBuyer = (id) => {
-        setBuyers((prev) => prev.filter((b) => b.id !== id));
+    const handleRoleChange = async (userId, newRole) => {
+        try {
+            const res = await fetch(`http://localhost:5000/users/${userId}/role`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ role: newRole }),
+            });
+            const data = await res.json();
+            if (data.success) {
+                toast.success("Role updated successfully");
+                fetchUsers();
+            } else {
+                toast.error(data.message || "Failed to update role");
+            }
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to update role");
+        }
+    };
+
+    // ---------------- Delete user ----------------
+    const handleDeleteUser = async (userId) => {
+        if (!window.confirm("Are you sure you want to delete this user?")) return;
+
+        try {
+            const res = await fetch(`http://localhost:5000/users/${userId}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            const data = await res.json();
+            if (data.success) {
+                toast.success("User deleted successfully");
+                fetchUsers();
+            } else {
+                toast.error(data.message || "Failed to delete user");
+            }
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to delete user");
+        }
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 p-6">
-            <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">
-                🛠️ Admin Dashboard
-            </h1>
+        <div className="min-h-screen bg-gray-100 p-6">
+            <ToastContainer position="top-right" autoClose={3000} />
+            <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
 
-            {/* Sellers Section */}
-            <div className="bg-white text-black shadow rounded-2xl p-6 mb-10">
-                <h2 className="text-2xl font-semibold mb-4 text-gray-700">All Sellers</h2>
-                <table className="min-w-full border rounded-lg">
-                    <thead>
-                        <tr className="bg-gray-100">
-                            <th className="py-2 px-4 text-left">Serial No</th>
-                            <th className="py-2 px-4 text-left">Name</th>
-                            <th className="py-2 px-4 text-left">Phone</th>
-                            <th className="py-2 px-4 text-left">Email</th>
-                            <th className="py-2 px-4 text-left">Status</th>
-                            <th className="py-2 px-4 text-center">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {sellers.map((seller, index) => (
-                            <tr key={seller.id} className="border-t hover:bg-gray-50">
-                                <td className="py-2 px-4">{index + 1}</td>
-                                <td className="py-2 px-4">{seller.name}</td>
-                                <td className="py-2 px-4">{seller.phone}</td>
-                                <td className="py-2 px-4">{seller.email}</td>
-                                <td className="py-2 px-4">
-                                    {seller.verified ? (
-                                        <span className="text-green-600 font-semibold flex items-center gap-1">
-                                            <CheckCircle size={16} /> Verified
-                                        </span>
-                                    ) : (
-                                        <span className="text-yellow-600">Unverified</span>
-                                    )}
-                                </td>
-                                <td className="py-2 px-4 flex justify-center gap-3">
-                                    {!seller.verified && (
-                                        <button
-                                            onClick={() => verifySeller(seller.id)}
-                                            className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg flex items-center gap-1"
-                                        >
-                                            <UserCheck size={16} /> Verify
-                                        </button>
-                                    )}
-                                    <button
-                                        onClick={() => deleteSeller(seller.id)}
-                                        className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg flex items-center gap-1"
-                                    >
-                                        <Trash2 size={16} /> Delete
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+            {/* Create User Form */}
+            <div className="mb-6 bg-white p-6 rounded shadow-md w-full max-w-lg">
+                <h2 className="text-xl font-semibold mb-4">Create New User</h2>
+                <form onSubmit={handleCreateUser} className="space-y-3">
+                    <input
+                        type="text"
+                        placeholder="Full Name"
+                        value={newUser.name}
+                        onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+                        className="w-full px-3 py-2 border rounded"
+                    />
+                    <input
+                        type="email"
+                        placeholder="Email"
+                        value={newUser.email}
+                        onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                        className="w-full px-3 py-2 border rounded"
+                    />
+                    <input
+                        type="password"
+                        placeholder="Password"
+                        value={newUser.password}
+                        onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                        className="w-full px-3 py-2 border rounded"
+                    />
+                    <select
+                        value={newUser.role}
+                        onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
+                        className="w-full px-3 py-2 border rounded"
+                    >
+                        <option value="user">User</option>
+                        <option value="buyer">Buyer</option>
+                        <option value="seller">Seller</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                    <button
+                        type="submit"
+                        className="w-full py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600"
+                    >
+                        Create User
+                    </button>
+                </form>
             </div>
 
-            {/* Buyers Section */}
-            <div className="bg-white text-black shadow rounded-2xl p-6">
-                <h2 className="text-2xl font-semibold mb-4 text-gray-700">All Buyers</h2>
-                <table className="min-w-full border rounded-lg">
-                    <thead>
-                        <tr className="bg-gray-100">
-                            <th className="py-2 px-4 text-left">Serial No</th>
-                            <th className="py-2 px-4 text-left">Name</th>
-                            <th className="py-2 px-4 text-left">Phone</th>
-                            <th className="py-2 px-4 text-left">Email</th>
-                            <th className="py-2 px-4 text-left">Status</th>
-                            <th className="py-2 px-4 text-center">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {buyers.map((buyer, index) => (
-                            <tr key={buyer.id} className="border-t hover:bg-gray-50">
-                                <td className="py-2 px-4">{index + 1}</td>
-                                <td className="py-2 px-4">{buyer.name}</td>
-                                <td className="py-2 px-4">{buyer.phone}</td>
-                                <td className="py-2 px-4">{buyer.email}</td>
-                                <td className="py-2 px-4">-</td>
-                                <td className="py-2 px-4 text-center">
-                                    <button
-                                        onClick={() => deleteBuyer(buyer.id)}
-                                        className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg flex items-center gap-1 mx-auto"
-                                    >
-                                        <Trash2 size={16} /> Delete
-                                    </button>
-                                </td>
+            {/* Users Table */}
+            <div className="overflow-x-auto bg-white rounded shadow-md p-4">
+                <h2 className="text-xl font-semibold mb-4">All Users</h2>
+                {loading ? (
+                    <p>Loading users...</p>
+                ) : users.length === 0 ? (
+                    <p>No users found.</p>
+                ) : (
+                    <table className="min-w-full border border-gray-200">
+                        <thead className="bg-gray-50">
+                            <tr>
+                                <th className="py-2 px-4 border-b">#</th>
+                                <th className="py-2 px-4 border-b">Name</th>
+                                <th className="py-2 px-4 border-b">Email</th>
+                                <th className="py-2 px-4 border-b">Role</th>
+                                <th className="py-2 px-4 border-b">Change Role</th>
+                                <th className="py-2 px-4 border-b">Delete</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {users.map((user, index) => (
+                                <tr key={user._id} className="hover:bg-gray-50">
+                                    <td className="py-2 px-4 border-b">{index + 1}</td>
+                                    <td className="py-2 px-4 border-b">{user.name}</td>
+                                    <td className="py-2 px-4 border-b">{user.email}</td>
+                                    <td className="py-2 px-4 border-b">{user.role}</td>
+                                    <td className="py-2 px-4 border-b">
+                                        <select
+                                            value={user.role}
+                                            onChange={(e) => handleRoleChange(user._id, e.target.value)}
+                                            className="px-2 py-1 border rounded"
+                                        >
+                                            <option value="user">User</option>
+                                            <option value="buyer">Buyer</option>
+                                            <option value="seller">Seller</option>
+                                            <option value="admin">Admin</option>
+                                        </select>
+                                    </td>
+                                    <td className="py-2 px-4 border-b">
+                                        <button
+                                            onClick={() => handleDeleteUser(user._id)}
+                                            className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                                        >
+                                            Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                )}
             </div>
         </div>
     );

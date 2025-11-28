@@ -1,22 +1,24 @@
 // PrivateRoute.jsx
 import React from "react";
 import { Navigate, useLocation } from "react-router-dom";
-
-// Replace this with your real authentication logic
-const isAuthenticated = () => {
-    // Example: check localStorage token
-    return localStorage.getItem("token") ? true : false;
-};
+import { useApp } from "../../context/AppContext/AppContext"; // ❗ AppContext নয়, useApp ব্যবহার করুন
 
 const PrivateRoute = ({ children }) => {
     const location = useLocation();
+    const { user, authLoading } = useApp();
 
-    if (!isAuthenticated()) {
-        // Redirect to login and preserve the location they were trying to access
-        return <Navigate to="/login" state={{ from: location }} replace />;
+    // যদি Firebase এখনো user লোড করছে → স্পিনার দেখাতে পারেন
+    if (authLoading) {
+        return <p>Loading...</p>;
     }
 
-    return children;
+    // যদি লগইন না থাকে → signin-এ পাঠানো হবে
+    if (user) {
+        return children;
+    }
+
+    return <Navigate to="/signin" state={{ from: location }} replace />;
+    
 };
 
 export default PrivateRoute;
