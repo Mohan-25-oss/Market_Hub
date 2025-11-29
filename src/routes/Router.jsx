@@ -12,7 +12,6 @@ import BuyerDashboard from "../pages/Dashboard/BuyerDashboard/BuyerDashboard";
 import Blog from "../pages/Blog/Blog";
 import Contact from "../pages/Contact/Contact";
 import About from "../pages/About/About";
-import BookingModalLayout from "../layout/BookingModalLayout/BookingModalLayout";
 import BookingModal from "../pages/BookingModal/BookingModal";
 import SellerDashboard from "../pages/Dashboard/SellerDashboard/SellerDashboard";
 import SingleUserDashboard from "../pages/Dashboard/SingleUserDashboard/SingleUserDashboard";
@@ -21,6 +20,9 @@ import Users from "../pages/Dashboard/AllUsersDashboard/Users";
 import AddProduct from "../pages/AddProduct/AddProduct";
 import Edit from "../pages/AddProduct/Edit";
 import AddCategoryProduct from "../pages/AddCategoryProduct/AddCategoryProduct";
+import AdminRoute from "./AdminRoute/AdminRoute";
+import BookingModalLayout from "../layout/BookingModalLayout/BookingModalLayout";
+import Profile from "../pages/Profile/Profile";
 
 const router = createBrowserRouter([
     {
@@ -31,16 +33,19 @@ const router = createBrowserRouter([
             { path: "home", element: <Home /> },
             { path: "about", element: <About /> },
             { path: "blog", element: <Blog /> },
-            { path: "contact", element: <PrivateRoute><Contact/></PrivateRoute> },
+            { path: "contact", element: <PrivateRoute><Contact /></PrivateRoute> },
             { path: "signin", element: <SignIn></SignIn> },
-            { path: "signup", element: <SignUp/> },
-            { 
-                path: "sellerDashboard/addProduct", 
+            { path: "signup", element: <SignUp /> },
+
+            { path: "dashboard/profile", 
+                element: <Profile /> },
+            {
+                path: "sellerDashboard/addProduct",
                 element: (
                     <PrivateRoute>
                         <AddProduct />
                     </PrivateRoute>
-                ) 
+                )
             },
             {
                 path: "category/:id",
@@ -58,26 +63,26 @@ const router = createBrowserRouter([
         path: "/dashboard",
         element: <DashboardLayout />,
         children: [
-            { path: "", element: <Dashboard /> },
+            { path: "dashboard", element: <Dashboard /> },
             { path: "adminDashboard", element: <AdminDashboard /> },
             { path: "users", element: <Users /> },
             { path: "sellerDashboard", element: <SellerDashboard /> },
-            { path: "buyerDashboard", element: <BuyerDashboard /> },
+            { path: "buyerDashboard", element: <AdminRoute><BuyerDashboard /></AdminRoute> },
             { path: "singleUserDashboard", element: <SingleUserDashboard /> },
-            { path: "addCategoryProduct", element: <AddCategoryProduct/> },
+            { path: "addCategoryProduct", element: <AddCategoryProduct /> },
         ],
     },
     // Seller dashboard routes (moved outside of dashboard for better structure)
     {
         path: "/sellerDashboard",
         children: [
-            { 
-                path: "edit/:id", 
+            {
+                path: "edit/:id",
                 element: (
                     <PrivateRoute>
                         <Edit />
                     </PrivateRoute>
-                ) 
+                )
             },
         ],
     },
@@ -89,7 +94,7 @@ const router = createBrowserRouter([
             { path: "", element: <BookingModal /> },
         ],
     },
-    
+
     // standalone route (if needed)
     {
         path: "/login",

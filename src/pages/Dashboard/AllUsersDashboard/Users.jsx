@@ -11,10 +11,13 @@ const Users = () => {
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem("token");
+
       const res = await fetch("http://localhost:5000/users", {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       const data = await res.json();
+
       setUsers(data.users || []);
     } catch (err) {
       console.error(err);
@@ -24,22 +27,30 @@ const Users = () => {
     }
   };
 
-  useEffect(() => { fetchUsers(); }, []);
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   // Delete a user
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
+
     try {
       const token = localStorage.getItem("token");
+
       const res = await fetch(`http://localhost:5000/users/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
+
       const data = await res.json();
+
       if (data.success) {
         toast.success("User deleted!");
-        setUsers(prev => prev.filter(u => u._id !== id));
-      } else toast.error("Delete failed!");
+        setUsers((prev) => prev.filter((u) => u._id !== id));
+      } else {
+        toast.error("Delete failed!");
+      }
     } catch (err) {
       console.error(err);
       toast.error("Delete failed!");
@@ -47,9 +58,9 @@ const Users = () => {
   };
 
   // Filter users by search term
-  const filteredUsers = users.filter(u =>
-    u.name.toLowerCase().includes(search.toLowerCase()) ||
-    u.email.toLowerCase().includes(search.toLowerCase())
+  const filteredUsers = users.filter((u) =>
+    (u.name || "").toLowerCase().includes(search.toLowerCase()) ||
+    (u.email || "").toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -63,16 +74,16 @@ const Users = () => {
           type="text"
           placeholder="Search by name or email"
           value={search}
-          onChange={e => setSearch(e.target.value)}
+          onChange={(e) => setSearch(e.target.value)}
           className="px-3 py-2 border rounded w-64"
         />
         <p className="text-gray-600">{filteredUsers.length} users found</p>
       </div>
 
       {loading ? (
-        <p>Loading users...</p>
+        <p className="text-lg text-gray-600">Loading users...</p>
       ) : filteredUsers.length === 0 ? (
-        <p>No users found.</p>
+        <p className="text-lg text-gray-600">No users found.</p>
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white border border-gray-200 rounded-lg">
@@ -93,12 +104,16 @@ const Users = () => {
                   <td className="py-2 px-4 border-b">{index + 1}</td>
                   <td className="py-2 px-4 border-b">{user.name}</td>
                   <td className="py-2 px-4 border-b">{user.email}</td>
-                  <td className="py-2 px-4 border-b">{user.password ? "Email/Password" : "Google"}</td>
+                  <td className="py-2 px-4 border-b">
+                    {user.password ? "Email/Password" : "Google"}
+                  </td>
                   <td className="py-2 px-4 border-b">{user.role || "user"}</td>
                   <td className="py-2 px-4 border-b">
-                    {user.createdAt ? new Date(user.createdAt).toLocaleString() : "-"}
+                    {user.createdAt
+                      ? new Date(user.createdAt).toLocaleString()
+                      : "-"}
                   </td>
-                  <td className="py-2 px-4 border-b flex gap-2">
+                  <td className="py-2 px-4 border-b">
                     <button
                       onClick={() => handleDelete(user._id)}
                       className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"

@@ -13,11 +13,11 @@ const PrivateRoute = ({ children }) => {
     }
 
     // যদি লগইন না থাকে → signin-এ পাঠানো হবে
-    if (user) {
-        return children;
+    if (!user) {
+        return <Navigate to="/signin" state={{ from: location }} replace />;
     }
-
-    return <Navigate to="/signin" state={{ from: location }} replace />;
+    // যদি লগইন থাকে → children রেন্ডার হবে
+    return children;
     
 };
 
