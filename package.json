@@ -16,10 +16,17 @@
     "@tailwindcss/vite": "^4.1.17",
     "@tanstack/react-query": "^5.90.9",
     "axios": "^1.13.2",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
     "date-fns": "^4.1.0",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
     "firebase": "^12.5.0",
     "framer-motion": "^12.23.24",
+    "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.553.0",
+    "mongoose": "^9.0.0",
+    "multer": "^2.0.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-hook-form": "^7.66.0",
@@ -43,5 +50,18 @@
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.17",
     "vite": "^7.2.2"
-  }
+  },
+  "description": "This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.",
+  "main": "eslint.config.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mohan-25-oss/Market_Hub.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Mohan-25-oss/Market_Hub/issues"
+  },
+  "homepage": "https://github.com/Mohan-25-oss/Market_Hub#readme"
 }

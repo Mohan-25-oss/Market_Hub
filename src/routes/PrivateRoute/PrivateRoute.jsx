@@ -1,7 +1,7 @@
 // PrivateRoute.jsx
 import React from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { useApp } from "../../context/AppContext/AppContext"; // ❗ AppContext নয়, useApp ব্যবহার করুন
+import { useApp } from "../../context/AppContext/AppContext"; 
 
 const PrivateRoute = ({ children }) => {
     const location = useLocation();
